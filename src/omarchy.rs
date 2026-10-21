@@ -70,6 +70,8 @@ pub enum Answer {
         placeholders: Vec<String>,
     },
     Keybinding(String),
+    /// A sentence or more from the manual: shown, never run.
+    Prose(String),
     Unknown(String),
 }
 
@@ -84,6 +86,9 @@ pub fn classify(scripts: &Scripts, text: &str) -> Answer {
         return Answer::Unknown(text.to_string());
     };
     if scripts.get(first).is_none() {
+        if words.len() >= 4 && !first.starts_with("omarchy-") {
+            return Answer::Prose(text.to_string());
+        }
         return Answer::Unknown(text.to_string());
     }
     let args: Vec<String> = words[1..].to_vec();

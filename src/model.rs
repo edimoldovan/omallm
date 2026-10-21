@@ -13,7 +13,7 @@ use llama_cpp_2::token::LlamaToken;
 
 const END_ID: i32 = 5; // <|end|> in the training tokenizer
 const EOS_ID: i32 = 2; // </s>
-const MAX_TOKENS: usize = 64;
+const MAX_TOKENS: usize = 192; // commands are short; manual answers run to about 90 words
 const N_CTX: u32 = 1024;
 
 pub struct Model {

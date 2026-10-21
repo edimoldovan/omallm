@@ -36,7 +36,7 @@ struct App {
     focus_input: bool,
 }
 
-/// The model file: the first argument, else $OMALLM_MODEL, else ~/models/run-004-Q8_0.gguf.
+/// The model file: the first argument, else $OMALLM_MODEL, else ~/models/omallm.gguf.
 fn model_path() -> PathBuf {
     model_path_from(std::env::args().nth(1))
 }
@@ -48,7 +48,7 @@ fn model_path_from(arg: Option<String>) -> PathBuf {
     if let Ok(path) = std::env::var("OMALLM_MODEL") {
         return PathBuf::from(path);
     }
-    PathBuf::from(std::env::var("HOME").unwrap_or_default()).join("models/run-004-Q8_0.gguf")
+    PathBuf::from(std::env::var("HOME").unwrap_or_default()).join("models/omallm.gguf")
 }
 
 fn main() -> eframe::Result {
@@ -133,6 +133,7 @@ impl App {
                         (omarchy::command_line(name, args), note)
                     }
                     Answer::Keybinding(key) => (key.clone(), "keybinding".into()),
+                    Answer::Prose(text) => (text.clone(), "from the manual".into()),
                     Answer::Unknown(text) => (text.clone(), "not an Omarchy command".into()),
                 };
                 (answer, command, note)
@@ -253,7 +254,11 @@ impl App {
             });
         } else {
             let (text, note) = (self.turns[i].command.clone(), self.turns[i].note.clone());
-            ui.label(RichText::new(text).monospace());
+            if matches!(self.turns[i].answer, Answer::Prose(_)) {
+                ui.add(egui::Label::new(RichText::new(text)).wrap());
+            } else {
+                ui.label(RichText::new(text).monospace());
+            }
             ui.label(RichText::new(note).weak());
         }
         if !self.turns[i].output.is_empty() {
